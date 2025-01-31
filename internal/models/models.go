@@ -1,14 +1,14 @@
-package server
+package models
 
 type Account struct {
 	ID        int
 	FirstName string
 	LastName  string
 	Number    int64
-	Balance   int64
+	Balance   float64
 }
 
-func NewAcount(firstName, lastName string) *Account {
+func NewAccount(firstName, lastName string) *Account {
 	return &Account{
 		ID:        99,
 		FirstName: firstName,

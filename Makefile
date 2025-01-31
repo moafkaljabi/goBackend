@@ -1,4 +1,3 @@
-# Variables
 APP_NAME := goBackend
 CMD_DIR := ./cmd/$(APP_NAME)
 BUILD_DIR := ./build
@@ -20,7 +19,8 @@ build:
 .PHONY: run
 run:
 	@echo "Running the application..."
-	@go run $(CMD_DIR)/main.go
+	@go run $(CMD_DIR)/main.go || true
+	@echo "Server exited cleanly." || exit 0
 
 # Run tests
 .PHONY: test

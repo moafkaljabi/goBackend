@@ -1,17 +1,109 @@
 package server
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"goBackend/internal/database"
+	"goBackend/internal/models"
 	"log"
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	"github.com/gorilla/mux"
 )
 
+func (s *APIServer) Run() {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleAccount))
+	router.HandleFunc("/Account/{id}", MakeHTTPHandleFunc(s.handleGetAccount))
+
+	server := &http.Server{
+		Addr:    s.listenAddr,
+		Handler: router,
+	}
+
+	// Create a channel to listen for OS signals (Ctrl+C, SIGTERM)
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
+
+	// Start server in a goroutine so it doesn't block
+	go func() {
+		log.Println("JSON server running on port:", s.listenAddr)
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("Server error: %s", err)
+		}
+	}()
+
+	// Wait for SIGINT or SIGTERM
+	<-stop
+	log.Println("Shutting down server...")
+
+	// Gracefully shut down the server with a timeout
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	if err := server.Shutdown(ctx); err != nil {
+		log.Fatalf("Server shutdown failed: %s", err)
+	}
+
+	log.Println("Server stopped successfully")
+}
+
+type APIServer struct {
+	listenAddr string
+	store      database.Storage
+}
+
+func NewAPIServer(listenAddr string, store database.Storage) *APIServer {
+	return &APIServer{
+		listenAddr: listenAddr,
+		store:      store,
+	}
+}
+
+func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
+	if r.Method == "GET" {
+		return s.handleGetAccount(w, r)
+	}
+	if r.Method == "POST" {
+		return s.handleCreateAccount(w, r)
+	}
+	if r.Method == "DELETE" {
+		return s.handleDeleteAccount(w, r)
+	}
+
+	return fmt.Errorf("method not allowed %s ", r.Method)
+}
+
+func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
+
+	id := mux.Vars(r)["id"]
+	fmt.Println(id)
+
+	return WriteJSON(w, http.StatusOK, &models.Account{})
+
+}
+
+func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
+func (s *APIServer) handleTransferAccount(w http.ResponseWriter, r *http.Request) error {
+	return nil
+}
+
 func WriteJSON(w http.ResponseWriter, status int, v any) error {
 	w.WriteHeader(status)
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Add("Content-Type", "application/json")
 	return json.NewEncoder(w).Encode(v)
 }
 
@@ -29,61 +121,4 @@ func MakeHTTPHandleFunc(f ApiFunc) http.HandlerFunc {
 			WriteJSON(w, http.StatusBadRequest, ApiError{Error: err.Error()})
 		}
 	}
-}
-
-// To start Server
-func (s *APIServer) Run() {
-	router := mux.NewRouter()
-
-	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleAccount))
-	router.HandleFunc("/Account/{id}", MakeHTTPHandleFunc(s.handleGetAccount))
-
-	log.Println("JSON servr running on port: ", s.listenAddr)
-
-	http.ListenAndServe(s.listenAddr, router)
-}
-
-type APIServer struct {
-	listenAddr string
-}
-
-func NewAPIServer(listenAddr string) *APIServer {
-	return &APIServer{
-		listenAddr: listenAddr,
-	}
-}
-
-func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error {
-	if r.Method == "GET" {
-		return s.handleGetAccount(w, r)
-	}
-	if r.Method == "POST" {
-		return s.handleCreateAccount(w, r)
-	}
-	if r.Method == "DELETE" {
-		return s.handleDeleteAccount(w, r)
-	}
-
-	return fmt.Errorf("Method not allowed %s ", r.Method)
-}
-
-func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
-
-	id := mux.Vars(r)["id"]
-	fmt.Println(id)
-
-	return WriteJSON(w, http.StatusOK, &Account{})
-
-}
-
-func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
-}
-
-func (s *APIServer) handleTransferAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
 }

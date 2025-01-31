@@ -1,0 +1,5 @@
+File	Package	Responsibilities
+main.go	main	Starts app, initializes DB & server
+models.go	models	Defines Account struct
+api.go	server	Handles HTTP requests, API routes
+storage.go	database	Interacts with PostgreSQL

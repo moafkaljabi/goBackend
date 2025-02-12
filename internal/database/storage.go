@@ -47,6 +47,8 @@ func NewPostgresStore() (*PostgresStore, error) {
 		return nil, err
 	}
 
+	println("Connected to database")
+
 	return &PostgresStore{db: db}, nil
 }
 

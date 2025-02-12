@@ -1,5 +1,7 @@
 package models
 
+// change account to devices.
+
 type Account struct {
 	ID        int
 	FirstName string

@@ -1,0 +1,38 @@
+
+
+File	                Package	                Responsibilities
+main.go	                main	                Starts app, initializes DB & server
+models.go	            models	                Defines Account struct
+api.go	                server	                Handles HTTP requests, API routes
+storage.go	            database	            Interacts with PostgreSQL
+
+
+
+file description:
+
+            main.go
+Initializes the PostgreSQL connection.
+Starts the HTTP server on port 3000.
+
+                            models.go
+Defines an Account struct (which you plan to replace with a Device struct).
+Provides a simple constructor for creating new accounts (to be adapted for devices).
+
+
+            database.go (Postgres Storage Layer)
+Implements database operations (Create, Update, Delete, Get).
+Currently interacts with an account table in PostgreSQL.
+Needs modification to store and manage IoT/Embedded devices instead of accounts.
+
+
+
+                api.go (HTTP Server Layer)
+Handles HTTP requests using Gorilla Mux.
+Defines API routes (/Account, /Account/{id}) to get, create, delete, and update accounts.
+Uses a structured APIServer to manage request handling.
+Needs refactoring to work with IoT devices rather than accounts
+
+
+
+
+

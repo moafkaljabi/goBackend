@@ -4,8 +4,10 @@ import (
 	"database/sql"
 	"fmt"
 	"goBackend/internal/models"
+	"log"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
@@ -24,7 +26,11 @@ type PostgresStore struct {
 
 // Initialize a new database connection
 func NewPostgresStore() (*PostgresStore, error) {
-	// Load credentials from environment variables
+	// Load environment variables from .env
+	if err := godotenv.Load(".env"); err != nil {
+		log.Println("No .env file found")
+	}
+
 	connStr := fmt.Sprintf(
 		"host=localhost port=5432 user=%s dbname=%s password=%s sslmode=disable",
 		os.Getenv("DB_USER"),

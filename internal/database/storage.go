@@ -1,3 +1,16 @@
+/*
+
+Create table for the Device model.
+
+Create CRUD operations for the Device model:
+func CreateDevice
+func UpdateDevice
+func DeleteDevice
+func GetDeviceByID
+
+
+*/
+
 package database
 
 import (

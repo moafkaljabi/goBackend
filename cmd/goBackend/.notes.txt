@@ -36,3 +36,27 @@ Needs refactoring to work with IoT devices rather than accounts
 
 
 
+- Rename and Refactor for Devices
+Change Account → Device in models.go, database.go, and api.go.
+Update database schema:
+Instead of first_name, last_name, balance, store device-specific attributes (e.g., device_id, type, status, sensor_data).
+Update table name in SQL queries (account → device).
+
+
+- Implement IoT-Specific Endpoints
+Modify API endpoints to manage devices instead of accounts:
+GET /device/{id} → Retrieve a device’s current state.
+POST /device → Register a new device.
+DELETE /device/{id} → Remove a device.
+
+
+- Connect With Your C++ TCP Client
+Implement a new API route (/device/data) where the C++ TCP client can send real-time sensor values.
+The server should parse the incoming JSON from the C++ TCP client and store it in the database.
+
+
+
+
+
+MQTT: Best for low-bandwidth, IoT-style messaging. Use for sensor data, commands, or device events.
+WebSockets: Best for live updates in the UI (e.g., a real-time dashboard).

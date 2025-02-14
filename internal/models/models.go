@@ -34,7 +34,7 @@ func NewAccount(firstName, lastName, password string) (*Account, error) {
 		EncryptedPassword: string(encryptedPassword),
 		Number:            100,
 		Balance:           1000,
-		CreatedAt:         time.Now(),
+		CreatedAt:         time.Now().UTC(),
 	}, nil
 }
 

@@ -6,7 +6,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// change account to devices.
+// add Devices
 
 type Account struct {
 	ID                int       `json:"id"`
@@ -39,9 +39,10 @@ func NewAccount(firstName, lastName, password string) (*Account, error) {
 }
 
 type Device struct {
-	DeviceID int
-	Name     string
-	Status   string
+	DeviceID  int
+	Name      string
+	Status    string
+	CreatedAt time.Time
 }
 
 func NewDevice(name, status string) *Device {

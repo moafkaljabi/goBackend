@@ -1,9 +1,13 @@
 package server
 
-/*
+import (
+	"encoding/json"
+	"net/http"
+	"server/internal/models"
+	"strconv"
+)
 
-
-func (s *Server) handleCreateDevice(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleCreateDevice(w http.ResponseWriter, r *http.Request) {
 	var device models.Device
 	if err := json.NewDecoder(r.Body).Decode(&device); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
@@ -19,7 +23,7 @@ func (s *Server) handleCreateDevice(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(device)
 }
 
-func (s *Server) handleGetDevices(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleGetDevices(w http.ResponseWriter, r *http.Request) {
 	userID := r.URL.Query().Get("user_id")
 	id, err := strconv.Atoi(userID)
 	if err != nil {
@@ -35,7 +39,3 @@ func (s *Server) handleGetDevices(w http.ResponseWriter, r *http.Request) {
 
 	json.NewEncoder(w).Encode(devices)
 }
-
-
-
-*/

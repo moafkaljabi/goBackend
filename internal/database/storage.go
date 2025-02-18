@@ -26,10 +26,19 @@ import (
 
 // Storage interface
 type Storage interface {
+
+	// Account methods
 	CreateAccount(*models.Account) error
 	DeleteAccount(int) error
 	UpdateAccount(*models.Account) error
 	GetAccountByID(int) (*models.Account, error)
+
+	// Device methods
+	CreateDevice(*models.Device) error
+	UpdateDevice(*models.Device) error
+	DeleteDevice(int) error
+	GetDeviceByID(int) (*models.Device, error)
+	GetDevicesByUserID(int) ([]*models.Device, error)
 }
 
 // Postgres storage implementation

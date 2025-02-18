@@ -124,3 +124,8 @@ func (s *PostgresStore) GetAccountByID(id int) (*models.Account, error) {
 	}
 	return acc, nil
 }
+
+func (s *PostgresStore) CreateDevice(device *models.Device) error {
+	query := `INSERT INTO device (name, status) VALUES ($1, $2) RETURNINIG device_id`
+	return s.db.QueryRow(query, device.Name, device.Status).Scan(&device.DeviceID)
+}

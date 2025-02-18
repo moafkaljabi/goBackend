@@ -49,5 +49,6 @@ func NewDevice(name, status string) *Device {
 	return &Device{
 		DeviceID: 100,
 		Name:     name,
+		Status:   status,
 	}
 }

@@ -2,8 +2,8 @@ package server
 
 import (
 	"encoding/json"
+	"models"
 	"net/http"
-	"server/internal/models"
 	"strconv"
 )
 

@@ -129,3 +129,45 @@ func (s *PostgresStore) CreateDevice(device *models.Device) error {
 	query := `INSERT INTO device (name, status) VALUES ($1, $2) RETURNINIG device_id`
 	return s.db.QueryRow(query, device.Name, device.Status).Scan(&device.DeviceID)
 }
+
+func (s *PostgresStore) UpdateDevice(device *models.Device) error {
+	query := `UPDATE device SET name=$1, status=$2 WHERE device_id=$3`
+	_, err := s.db.Exec(query, device.Name, device.Status, device.DeviceID)
+	return err
+}
+
+func (s *PostgresStore) DeleteDevice(deviceID int) error {
+	query := `DELETE FROM device WHERE device_id=$1`
+	_, err := s.db.Exec(query, deviceID)
+	return err
+}
+
+func (s *PostgresStore) GetDeviceByID(deviceID int) (*models.Device, error) {
+	query := `SELECT device_id, name, status FROM device WHERE device_id=$1`
+	device := &models.Device{}
+	err := s.db.QueryRow(query, deviceID).Scan(&device.DeviceID, &device.Name, &device.Status)
+	if err != nil {
+		return nil, err
+	}
+	return device, nil
+}
+
+func (s *PostgresStore) GetDevicesByUserID(userID int) ([]*models.Device, error) {
+	query := `SELECT device_id, name, status FROM device WHERE user_id=$1`
+	rows, err := s.db.Query(query, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	devices := make([]*models.Device, 0)
+	for rows.Next() {
+		device := &models.Device{}
+		err := rows.Scan(&device.DeviceID, &device.Name, &device.Status)
+		if err != nil {
+			return nil, err
+		}
+		devices = append(devices, device)
+	}
+
+	return devices, nil
+}

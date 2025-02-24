@@ -2,7 +2,7 @@ package server
 
 import (
 	"encoding/json"
-	"models"
+	"goBackend/internal/models"
 	"net/http"
 	"strconv"
 )

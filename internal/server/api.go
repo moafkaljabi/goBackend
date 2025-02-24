@@ -19,9 +19,12 @@ import (
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
 
+	// Account routes
 	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleAccount))
 	router.HandleFunc("/Account/{id}", MakeHTTPHandleFunc(s.handleGetAccount))
 
+	// Device routes
+	router.HandleFunc("/Device", MakeHTTPHandleFunc(s.handleCreateDevice)).Methods(("POST"))
 	server := &http.Server{
 		Addr:    s.listenAddr,
 		Handler: router,

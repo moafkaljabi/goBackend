@@ -7,20 +7,21 @@ import (
 	"strconv"
 )
 
-func (s *APIServer) handleCreateDevice(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleCreateDevice(w http.ResponseWriter, r *http.Request) error {
 	var device models.Device
 	if err := json.NewDecoder(r.Body).Decode(&device); err != nil {
 		http.Error(w, "Invalid request", http.StatusBadRequest)
-		return
+		return err
 	}
 
 	err := s.store.CreateDevice(&device)
 	if err != nil {
 		http.Error(w, "Failed to create device", http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	json.NewEncoder(w).Encode(device)
+	return WriteJSON(w, http.StatusCreated, device)
 }
 
 func (s *APIServer) handleGetDevices(w http.ResponseWriter, r *http.Request) {

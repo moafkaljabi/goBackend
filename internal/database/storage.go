@@ -76,7 +76,14 @@ func NewPostgresStore() (*PostgresStore, error) {
 
 // Initialize the database (Create tables if needed)
 func (s *PostgresStore) Init() error {
-	return s.CreateAccountTable()
+	if err := s.CreateAccountTable(); err != nil {
+		return err
+	}
+
+	if err := s.CreateDeviceTable(); err != nil {
+		return err
+	}
+	return nil
 }
 
 // Create the accounts table if it doesn't exist
@@ -123,6 +130,19 @@ func (s *PostgresStore) GetAccountByID(id int) (*models.Account, error) {
 		return nil, err
 	}
 	return acc, nil
+}
+
+// Device methods
+
+func (s *PostgresStore) CreateDeviceTable() error {
+	query := `CREATE TABLE IF NOT EXISTS device (
+		device_id SERIAL PRIMARY KEY,
+		name VARCHAR(50),
+		status VARCHAR(50),
+		created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+		)`
+	_, err := s.db.Exec((query))
+	return err
 }
 
 func (s *PostgresStore) CreateDevice(device *models.Device) error {

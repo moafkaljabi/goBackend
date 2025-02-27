@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -18,6 +19,7 @@ import (
 
 func (s *APIServer) Run() {
 	router := mux.NewRouter()
+	router.HandleFunc("/", MakeHTTPHandleFunc(s.handleAccount))
 
 	// Account routes
 	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleAccount))
@@ -27,6 +29,8 @@ func (s *APIServer) Run() {
 
 	// Device routes
 	router.HandleFunc("/Device", MakeHTTPHandleFunc(s.handleCreateDevice)).Methods(("POST"))
+	//router.HandleFunc("/Device/{id}", MakeHTTPHandleFunc(s.handleGetDevicesByUserID)).Methods(("GET"))
+
 	server := &http.Server{
 		Addr:    s.listenAddr,
 		Handler: router,
@@ -87,10 +91,20 @@ func (s *APIServer) handleAccount(w http.ResponseWriter, r *http.Request) error 
 
 func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) error {
 
-	id := mux.Vars(r)["id"]
-	fmt.Println(id)
+	idStr := mux.Vars(r)["id"]
+	fmt.Println("Fetching account with ID:", idStr)
 
-	return WriteJSON(w, http.StatusOK, &models.Account{})
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		return fmt.Errorf("invalid account ID: %s", err)
+	}
+	// Get the account from the database
+	account, err := s.store.GetAccountByID(id)
+	if err != nil {
+		return fmt.Errorf("failed to get account: %s", err)
+	}
+
+	return WriteJSON(w, http.StatusOK, account)
 
 }
 

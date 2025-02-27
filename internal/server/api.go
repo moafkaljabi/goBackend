@@ -23,6 +23,8 @@ func (s *APIServer) Run() {
 	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleAccount))
 	router.HandleFunc("/Account/{id}", MakeHTTPHandleFunc(s.handleGetAccount))
 
+	router.HandleFunc("/Account", MakeHTTPHandleFunc(s.handleCreateAccount)).Methods("POST")
+
 	// Device routes
 	router.HandleFunc("/Device", MakeHTTPHandleFunc(s.handleCreateDevice)).Methods(("POST"))
 	server := &http.Server{
@@ -93,7 +95,20 @@ func (s *APIServer) handleGetAccount(w http.ResponseWriter, r *http.Request) err
 }
 
 func (s *APIServer) handleCreateAccount(w http.ResponseWriter, r *http.Request) error {
-	return nil
+
+	// Decode the request
+	var account models.Account
+	if err := json.NewDecoder(r.Body).Decode(&account); err != nil {
+		return fmt.Errorf("failed to decode request body: %s", err)
+	}
+
+	// save the account
+	if err := s.store.CreateAccount(&account); err != nil {
+		return fmt.Errorf("failed to create account: %s", err)
+	}
+
+	// return the created account
+	return WriteJSON(w, http.StatusCreated, account)
 }
 
 func (s *APIServer) handleDeleteAccount(w http.ResponseWriter, r *http.Request) error {

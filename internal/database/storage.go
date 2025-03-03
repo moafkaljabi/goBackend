@@ -191,3 +191,4 @@ func (s *PostgresStore) GetDevicesByUserID(userID int) ([]*models.Device, error)
 
 	return devices, nil
 }
+a
